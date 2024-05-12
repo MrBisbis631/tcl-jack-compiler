@@ -1,0 +1,6 @@
+# dev environment files
+.vscode
+target
+
+# compiled packages
+packages/tclxml-3.2
