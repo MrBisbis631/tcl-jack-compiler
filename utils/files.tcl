@@ -10,6 +10,14 @@ proc get_target_dir {file_path} {
   return "[file normalize .]/target/$file_path"
 }
 
+# Set up the target directory
+proc set_up_target_dir {target_path} {
+  set target_dir "[file normalize .]/target/$target_path"
+  file delete -force $target_dir
+  file mkdir $target_dir
+  return $target_dir
+}
+
 # Get the files nanme in a directory acording to specific extension
 # set dir_relative_to_root empty string to get the files in the root directory
 proc get_files_name_by_extention {dir_relative_to_root extension} {
@@ -24,4 +32,9 @@ proc generate_lines {file_path} {
   }
   close $fd
   yield "\0"
+}
+
+#  Get the filename without the extention
+proc filename_no_extention {file_path} {
+  return [string range [file tail $file_path] 0 [expr {[string last "." [file tail $file_path]] - 1}]]
 }
