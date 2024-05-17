@@ -36,7 +36,7 @@ See documentation at `./packages/tclxml-3.2/README.html` or at https://tclxml.so
     ```
   - test the installation using `tclsh` command.
     ```tcl
-    package require TclXML
+    package require xml
     ```
     - **note** if you get an error, see installation docs at `./packages/tclxml-3.2/README.html`
 
