@@ -1,5 +1,5 @@
 ### TCL installation
-From Ubuntu 20.04 **and not older** versions - You can't install TclXML 3.2 on Ubuntu 22.* or 24.*.
+From Ubuntu 20.04 **and not latest** versions - You can't install TclXML 3.2 on Ubuntu 22.* or 24.*.
 run `sudo apt install tcl-dev`, test the installation using `tclsh` command.
 
 **note** `sudo apt install tcl` won't let you install packages. 
@@ -12,8 +12,6 @@ sudo apt-get install libxslt-dev
 ```
 
 ## Packages
-From Ubuntu 20.04 or latest.
-
 ### TclXML 3.2
 #### Description
 TclXML is a package that provides XML parsing for the Tcl scripting language. It is based on the Expat XML parser, but provides a higher-level, more Tcl-friendly interface.
