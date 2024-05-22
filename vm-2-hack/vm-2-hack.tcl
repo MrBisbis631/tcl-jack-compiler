@@ -4,33 +4,36 @@ source "[file normalize .]/vm-2-hack/functions-call.tcl"
 
 # convert a VM line to HACK assembly
 proc vm_to_hack {line} {
-  # trim the line, remove comments and return the components of the line
-  set line_components_list [split [string first "//" [string trim $line]]]
-
-  # if emply -> comment => skip
-  if {[string is space $line_components_list]} {
+  # ignore empty lines and comments
+  if {[string is space $line] || [string match "//*" $line]} {
     return ""
   }
 
+  # trim and remove comments from the line
+  set line_without_comment [
+    string trim [
+      lindex [split [string trim $line] "//"] 0
+    ]
+  ]
+  set instruction_components_list [split $line_without_comment]
   # get the instruction from the line
-  set instruction [lindex $line_components_list 0]
-
+  set instruction [lindex $instruction_components_list 0]
   # handle the operation by number of arguments in the line
-  switch [lindex $line_components_list] {
-    3 {
+  switch [llength $instruction_components_list] {
+    1 {
       return [handle_0_args_instruction $instruction]
     }
     2 {
-      set arg1 [lindex $line_components_list 1]
+      set arg1 [lindex $instruction_components_list 1]
       return [handle_1_args_instruction $instruction $arg1]
     }
-    1 {
-      set arg1 [lindex $line_components_list 1]
-      set arg2 [lindex $line_components_list 2]
+    3 {
+      set arg1 [lindex $instruction_components_list 1]
+      set arg2 [lindex $instruction_components_list 2]
       return [handle_2_args_instruction $instruction $arg1 $arg2]
     }
     default {
-      puts "WARNING: unknown operation: $line"
+      puts "WARNING: unknown operation: $instruction_components_list"
       return ""
     }
   }
@@ -95,7 +98,7 @@ proc handle_1_args_instruction {instruction arg1} {
       return [hack_if_goto $arg1]
     }
     default {
-      puts "WARNING: unknown operation: $instruction"
+      puts "WARNING: unknown operation: $instruction $arg1"
       return ""
     }
   }
@@ -104,25 +107,45 @@ proc handle_1_args_instruction {instruction arg1} {
 # handle instructions with 2 arguments
 proc handle_2_args_instruction {instruction arg1 arg2} {
   switch $instruction {
-    "push" {
-      return [hack_push $arg1 $arg2]
-    }
-    "pop" {
-      if {$arg1 == "local"} {
-        return [hack_pop_local $arg2]
-      } else {
-        puts "WARNING: unknown operation: $instruction"
-        return ""                
-      }
-    }
     "function" {
       return [hack_function $arg1 $arg2]
     }
     "call" {
       return [hack_call $arg1 $arg2]
     }
+    "push" {
+      switch $arg1 {
+        "constant" {
+          return [hack_push_constant $arg2]
+        }
+        "local" {
+          return [hack_push_local $arg2]
+        }
+        "argument" {
+          return [hack_push_argument $arg2]
+        }
+        default {
+          puts "WARNING: unknown push operation: $instruction $arg1 $arg2"
+          return ""
+        }
+      }
+    }
+    "pop" {
+      switch $arg1 {
+        "local" {
+          return [hack_pop_local $arg2]
+        }
+        "argument" {
+          return [hack_pop_argument $arg2]
+        }
+        default {
+          puts "WARNING: unknown pop operation: $instruction $arg1 $arg2"
+          return ""
+        }
+      }
+    }
     default {
-      puts "WARNING: unknown operation: $instruction"
+      puts "WARNING: unknown 3 args operation: $instruction $arg1 $arg2"
       return ""
     }
   }
