@@ -17,5 +17,5 @@ proc hack_goto {label} {
 
 # Generates a conditional jump command, pops the stack, and jumps if non-zero.
 proc hack_if_goto {label} {
-  return "@SP\nM=M-1\nA=M\nD=M\n@$label\nD; JNE\n"
+  return "@SP\nAM=M-1\nD=M\n@$label\nD;JNE"
 }
