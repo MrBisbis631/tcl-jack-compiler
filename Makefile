@@ -7,6 +7,9 @@ xml-example:
 test-vm-2-hack-stack:
 	tclsh ./tcl-examples/test-vm-2-hack-stack.tcl
 
+thread-pool:
+	tclsh ./tcl-examples/thread-pool.tcl
+
 # Exeersises
 
 ex0:
