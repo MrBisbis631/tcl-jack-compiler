@@ -56,10 +56,14 @@ or `./tcl-examples/tclxml.tcl` for a simple example, and run `make xml-example` 
 
 Thread is a package that provides a script-level implementation of threads in the Tcl scripting language. It is modelled after the Java thread model, and provides a scripting language interface to the POSIX threads (pthreads) that are available in most modern operating systems.
 
+#### Usage
+
+Usually you'll create a thread with `set $thread_id [thread::create]`, then you initialize it with the command `[thread::send] $thread_id $script` - `$script` is a string containing a handler and `$thread_id` is from the thread created previously, then you can send tasks to its event-loop using the commend `[thread::send] $thread_id [list handler $arg1 $arg2 ...]` `handler` is defined in `script` and `arg1 arg2 ...` are the parameters of handler `handler`.
+
 #### Docs
 
 See https://www.tcl-lang.org/man/tcl/ThreadCmd/thread.htm and https://wiki.tcl-lang.org/page/thread
-You have an example at `./tcl-examples/thread.tcl` as well.
+You have an example at `./tcl-examples/test-vm-2-threads.tcl` and `./tcl-examples/thread-pool.tcl` for the use of pool.
 
 #### Installation
 
