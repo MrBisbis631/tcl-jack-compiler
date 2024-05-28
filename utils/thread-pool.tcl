@@ -13,16 +13,30 @@ proc create_thread_pool {worker_count script} {
   return $pool
 }
 
-# Destroy the given thread pool
-proc destroy_thread_pool {pool} {
-  # Send exit message to each worker thread
+# Load the given script to the worker threads in the given pool
+proc load_script_to_pool {pool script {async 1}} {
   foreach thread $pool {
-    thread::send $thread {exit}
+    if {$async} {
+      thread::send -async $thread $script
+    } else {
+      thread::send $thread $script
+    }
   }
-  # # Wait for each worker thread to exit
-  # foreach thread $pool {
-  #   thread::join $thread
-  # }
+}
+
+proc destroy_thread_pool {pool} {
+  # Send exit cmd to each worker thread in the pool
+  foreach thread $pool {
+    thread::release $thread
+  }
+}
+
+# Wait for all the worker threads in the pool to finish
+proc wait_for_pool_to_finish {pool} {
+  # send empty script in syncronous mode to each worker thread
+  foreach thread $pool {
+    thread::send $thread {}
+  }
 }
 
 # return the next worker thread in the round-robin fashion from the given `pool`
