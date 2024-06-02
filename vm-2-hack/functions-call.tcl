@@ -1,6 +1,6 @@
 # translate VM call function to HACK assembly
 proc hack_call {func_name args_count} {
-  set return_label "RETURN_${func_name}_[clock seconds]"
+  set return_label "RETURN_${func_name}_[number_gen]"
   return "
 @$return_label
 D=A
