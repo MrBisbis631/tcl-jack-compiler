@@ -1,0 +1,14 @@
+# Utilities for xml parsing and generation
+
+# Convert a token (dict with `type` and `value`) to an XML node
+proc token_to_xml_node {token parent} {
+  # ensure token is a dict with `type` and `value` keys
+  if {![dict exists $token type] || ![dict exists $token value]} {
+    error "Token $token must contain 'type' and 'value' keys"
+  }
+
+  # create node named after token type
+  set node [::dom::document createElement $parent [dict get $token type]]
+  # insert text node with token value
+  ::dom::document createTextNode $node [dict get $token value]
+}
