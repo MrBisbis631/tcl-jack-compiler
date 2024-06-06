@@ -14,10 +14,6 @@ proc hack_push_constant {const} {
   return "@${const}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
 }
 
-proc hack_pop {} {
-  return "@SP\nM=M-1\nA=M\nD=M\n"
-}
-
 proc hack_add {} {
   return [stack_operation "+"]
 }
