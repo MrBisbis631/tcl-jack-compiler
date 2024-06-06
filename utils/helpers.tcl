@@ -11,3 +11,9 @@ proc number_gen {} {
 proc uniq_label {label} {
   return "${label}_[number_gen]"
 }
+
+# generate resoults from a generator and pipe them to a command
+proc pipe_coroutine_generator {command generator} {
+  set gen_res [$generator]
+  yield [$command $gen_res]
+}
