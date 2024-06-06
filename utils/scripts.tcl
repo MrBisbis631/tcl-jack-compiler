@@ -3,7 +3,7 @@
 # keep the following convention:
 # name:  `<handler_name>_script`
 # The only function in the  script is the handler, named <handler_name>, where `<handler_name>_script` is the script name
-# don't forget to add add the import `source "[file normalize .]/utils/imports.tcl"` to each script 
+# don't forget to add add the import `source "[file normalize .]/utils/imports.tcl"` to each script
 
 
 # script for the thread that transpiles a VM file to a Hack assembly file
@@ -31,3 +31,33 @@ set transpile_vm_file_to_hack_script {
     }
   }
 }
+
+# script for the thread that tokenizes a jack file
+set tokenize_file_to_xml_script {
+  source "[file normalize .]/utils/imports.tcl"
+
+  proc tokenize_file_to_xml {jack_file_path output_dir} {
+    set o_fd [open "$output_dir/[filename_no_extention $jack_file_path]T.xml" "w"]
+    puts "TOKENIZING FILE: $jack_file_path\n"
+    try {
+      # xml file
+      set doc [::dom::DOMImplementation create]
+      set root [::dom::document createElement $doc "tokens"]
+
+      # tokenize each line of the file
+      for {set line [coroutine line_generator generate_lines $jack_file_path]} {$line != "\0"} {set line [line_generator]} {
+        # append every token to the xml file
+        foreach token [tokenize $line] {
+          token_to_xml_node $token $root
+        }
+
+      }
+
+      # finaly append the root to the document
+      puts $o_fd [::dom::DOMImplementation serialize $doc -indent 1]
+    } finally {
+      close $o_fd
+    }
+  }
+}
+
