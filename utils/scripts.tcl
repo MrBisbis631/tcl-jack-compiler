@@ -16,6 +16,25 @@ set transpile_vm_file_to_hack_script {
   proc transpile_vm_file_to_hack {vm_file_path output_dir} {
     set o_fd [open "$output_dir/[filename_no_extention $vm_file_path].asm" "w"]
     puts $o_fd "// TRANSPILED FILE: $vm_file_path\n"
+
+    # add the bootstrap code if the file is a Main.vm file and inject Sys.vm
+    if {[string match "*Main.vm" $vm_file_path]} {
+      puts $o_fd [hack_bootstrap]
+
+      # inject Sys.vm
+      puts $o_fd "// INJECTING Sys.vm\n"
+      set sys_vm_path [file join [file dirname $vm_file_path] "Sys.vm"]
+      for {set line [coroutine line_generator generate_lines $sys_vm_path]} {$line != "\0"} {set line [line_generator]} {
+        # skip empty lines and comments
+        if {[string is space $line] || [string match "//*" $line]} {
+          continue
+        }
+
+        puts $o_fd "// CMD: $line"
+        puts $o_fd [vm_to_hack $line]
+      }
+    }
+
     try {
       for {set line [coroutine line_generator generate_lines $vm_file_path]} {$line != "\0"} {set line [line_generator]} {
         # skip empty lines and comments
@@ -60,4 +79,3 @@ set tokenize_file_to_xml_script {
     }
   }
 }
-
