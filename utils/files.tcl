@@ -38,3 +38,12 @@ proc generate_lines {file_path} {
 proc filename_no_extention {file_path} {
   return [string range [file tail $file_path] 0 [expr {[string last "." [file tail $file_path]] - 1}]]
 }
+
+# Get the file xml content and return the XML doc object
+proc xml_file_to_dom_doc {xml_file_path} {
+  set xml_fd [open $xml_file_path r]
+  set xml_content [read $xml_fd]
+  close $xml_fd
+  set doc [::dom::DOMImplementation parse $xml_content]
+  return $doc
+}
