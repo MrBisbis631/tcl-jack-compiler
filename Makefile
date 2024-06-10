@@ -16,6 +16,9 @@ tokenize-simple:
 file-tokenizing:
 	tclsh ./tcl-examples/test-file-tokenizing.tcl
 
+read-tokens:
+	tclsh ./tcl-examples/read-tokens.tcl
+
 # Exeersises
 
 ex0:
