@@ -17,7 +17,7 @@ proc expression_parser {parent} {
 
 # term -> integerConstant | stringConstant | keywordConstant | varName | varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
 proc term_parser {parent} {
-  global keywordToken symbolToken integerConstantToken stringConstantToken
+  global keywordToken integerConstantToken stringConstantToken
 
   set node [create_xml_node $parent "term"]
 
@@ -26,7 +26,7 @@ proc term_parser {parent} {
   set type [dict get $token type]
 
   # integerConstant | stringConstant | keywordConstant
-  if {[regexp "$keywordToken(name)|$symbolToken(name)|$integerConstantToken(name)|$stringConstantToken(name)" $type]} {
+  if {[regexp "$keywordToken(name)|$integerConstantToken(name)|$stringConstantToken(name)" $type]} {
     prossess_terminal $node $type $value
 
     # varName | varName '[' expression ']' | subroutineCall
