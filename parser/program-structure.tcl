@@ -16,10 +16,10 @@ proc class_parser {parent} {
   prossess_terminal $node "symbol" "\{"
 
   # classVarDec*
-  while {[class_var_dec_parser $node]} {}
+  while {[class_var_dec_parser $node] != ""} {}
 
   # subroutineDec*
-  while {[subroutine_dec_parser $node]} {}
+  while {[subroutine_dec_parser $node] != ""} {}
 
   # '}'
   prossess_terminal $node "symbol" "\}"
