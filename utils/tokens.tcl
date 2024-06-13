@@ -7,8 +7,9 @@ set __current_token {}
 
 # initialize the tokens generator
 proc init_tokens_generator {tokens_corutine_name} {
-  global __tokens_generator
+  global __tokens_generator __current_token
   set __tokens_generator $tokens_corutine_name
+  set __current_token [$tokens_corutine_name]
 }
 
 # get the current token
@@ -39,6 +40,16 @@ proc get_next_token {} {
   global __tokens_generator __current_token
   set __current_token [$__tokens_generator]
   return $__current_token
+}
+
+# insert a leaf into the xml persed tree
+proc prossess_terminal {parent type value} {
+  set token_value [get_current_token_value]
+  if {$token_value != $value} {
+    error "PARSER ERROR: expected $value but got $token_value"
+  }
+  create_xml_leaf $parent $type $value
+  get_next_token
 }
 
 # check if the current token is an operator
