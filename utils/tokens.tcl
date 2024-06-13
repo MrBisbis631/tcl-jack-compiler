@@ -48,13 +48,14 @@ proc prossess_terminal {parent type value} {
   if {$token_value != $value} {
     error "PARSER ERROR: expected $value but got $token_value"
   }
-  create_xml_leaf $parent $type $value
+  # TODO remove spaces
+  create_xml_leaf $parent $type " $value "
   get_next_token
 }
 
 # check if the current token is an operator
 proc is_op {value} {
-  return [regexp {^[+\-*/&|<>]=$} $value]
+  return [regexp {[+\-*/<>]} $value]
 }
 
 # check if the current token is a unary operator
@@ -62,7 +63,15 @@ proc is_unary_op {value} {
   return [regexp {^[-!]$} $value]
 }
 
-proc is_expression {value} {
+proc is_expression {token} {
+  set value [dict get $token value]
+  set type [dict get $token type]
+  
+  # any constant is an expression
+  if {$type == "integerConstant" || $type == "stringConstant" || $type == "keywordConstant" || $type == "identifier"} {
+    return 1
+  }
+
   set number_regex {^[0-9]+$}
   set string_regex {^".*"$}
   set keyword_regex {^(true|false|null|this)$}
