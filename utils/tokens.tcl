@@ -55,12 +55,12 @@ proc prossess_terminal {parent type value} {
 
 # check if the current token is an operator
 proc is_op {value} {
-  return [regexp {[+\-*/<>]} $value]
+  return [regexp {[+\-*/<>|&=]} $value]
 }
 
 # check if the current token is a unary operator
 proc is_unary_op {value} {
-  return [regexp {^[-!]$} $value]
+  return [regexp {^[-~]$} $value]
 }
 
 proc is_expression {token} {
