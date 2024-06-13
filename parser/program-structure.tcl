@@ -163,16 +163,16 @@ proc var_dec_parser {parent} {
 }
 
 # className
-proc class_name {parent} {
+proc class_name_parser {parent} {
   prossess_terminal $parent "identifier" [get_current_token_value]
 }
 
 # subroutineName
-proc subroutine_name {parent} {
+proc subroutine_name_parser {parent} {
   prossess_terminal $parent "identifier" [get_current_token_value]
 }
 
 # varName
-proc var_name {parent} {
+proc var_name_parser {parent} {
   prossess_terminal $parent "identifier" [get_current_token_value]
 }
