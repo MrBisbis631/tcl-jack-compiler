@@ -47,3 +47,15 @@ proc xml_file_to_dom_doc {xml_file_path} {
   set doc [::dom::DOMImplementation parse $xml_content]
   return $doc
 }
+
+# get files name by the postfix 
+proc get_files_name_by_postfix {dir_path postfix} {
+  return [glob -nocomplain -directory $dir_path *$postfix]
+}
+
+# write the `doc` the spesified `file_path`
+proc write_dom_doc_to_file {doc file_path} {
+  set fd [open $file_path w]
+  puts $fd [::dom::DOMImplementation serialize $doc -indent 1]
+  close $fd
+}
