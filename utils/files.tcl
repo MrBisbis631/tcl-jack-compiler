@@ -59,3 +59,9 @@ proc write_dom_doc_to_file {doc file_path} {
   puts $fd [::dom::DOMImplementation serialize $doc -indent 1]
   close $fd
 }
+
+# Get the file <filename>T.xml => <filename>.xml
+proc token_file_name_to_parsed_file_name {filepath} {
+  set filename [filename_no_extention $filepath]
+  return "[string range $filename 0 [expr [string last "T" $filename] - 1]].xml"
+}
