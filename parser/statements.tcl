@@ -1,31 +1,26 @@
 # Analizer for statments in Jake language
 
 # parse a single a list of statments
-proc statments_parser {parent} {
+proc statements_parser {parent} {
   set node [create_xml_node $parent "statements"]
 
   # (let | if | while | do | return)*
-  while {token != "\0"} {
-    set child {}
-
+  while {[regexp {let|if|while|do|return} [get_current_token_value]]} {
     switch [get_current_token_value] {
-      case "let" {
-        set child [let_statement_parser $node]
+      "let" {
+        let_statement_parser $node
       }
-      case "if" {
-        set child [if_statement_parser $node]
+      "if" {
+        if_statement_parser $node
       }
-      case "while" {
-        set child [while_statement_parser $node]
+      "while" {
+        while_statement_parser $node
       }
-      case "do" {
-        set child [do_statement_parser $node]
+      "do" {
+        do_statement_parser $node
       }
-      case "return" {
-        set child [return_statement_parser $node]
-      }
-      default {
-        break
+      "return" {
+        return_statement_parser $node
       }
     }
   }
@@ -72,14 +67,14 @@ proc if_statement_parser {parent} {
   # open curly braces
   prossess_terminal $node "symbol" "\{"
   # statements
-  statments_parser $node
+  statements_parser $node
   # close curly braces
   prossess_terminal $node "symbol" "\}"
   # optional else statement
   if {[get_current_token_value] == "else" } {
     prossess_terminal $node "keyword" "else"
     prossess_terminal $node "symbol" "\{"
-    statments_parser $node
+    statements_parser $node
     prossess_terminal $node "symbol" "\}"
   }
 
@@ -101,7 +96,7 @@ proc while_statement_parser {parent} {
   # open curly braces
   prossess_terminal $node "symbol" "\{"
   # statements
-  statments_parser $node
+  statements_parser $node
   # close curly braces
   prossess_terminal $node "symbol" "\}"
 

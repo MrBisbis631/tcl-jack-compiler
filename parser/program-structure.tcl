@@ -30,7 +30,7 @@ proc class_parser {parent} {
 # classVarDec
 proc class_var_dec_parser {parent} {
   set token [get_current_token_value]
-  if {![string match "static|field" $token]} {
+  if {![regexp {static|field} $token]} {
     return ""
   }
 
@@ -60,16 +60,18 @@ proc class_var_dec_parser {parent} {
 # type
 proc type_parser {parent} {
   # set node name to keyword if the token is int, char or boolean otherwise (class declaration) set it to identifier
-  set node_type [expr {[string match "int|char|boolean" [get_current_token_value]] ? "keyword" : "identifier"}]
+  set node_type [expr {[regexp {int|char|boolean} [get_current_token_value]] ? "keyword" : "identifier"}]
   # node is flat - goes to the parent
-  set node [create_xml_node $parent $node_type]
-  return $node
+  prossess_terminal $parent $node_type [get_current_token_value]
+  return $parent
 }
 
 # subroutineDec
 proc subroutine_dec_parser {parent} {
   set token [get_current_token_value]
-  if {![string match "constructor|function|method" $token]} {
+
+  # finished the soubroutineDec
+  if {![regexp {constructor|function|method} $token]} {
     return ""
   }
 
@@ -127,7 +129,7 @@ proc subroutine_body_parser {parent} {
   prossess_terminal $node "symbol" "\{"
   # varDec*
   while {[get_current_token_value] eq "var"} {
-    [var_dec_parser $node]
+    var_dec_parser $node
   }
   # statements
   statements_parser $node
