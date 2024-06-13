@@ -48,7 +48,7 @@ See documentation at `./packages/tclxml-3.2/README.html` or at https://tclxml.so
 #### Example & Usage
 
 See `./packages/tclxml-3.2/examples/` for examples,
-or `./tcl-examples/tclxml.tcl` for a simple example, and run `make xml-example` to test it.
+or `./examples/tclxml.tcl` for a simple example, and run `make xml-example` to test it.
 
 ### Thread 2.8.\*
 
@@ -63,7 +63,7 @@ Usually you'll create a thread with `set $thread_id [thread::create]`, then you 
 #### Docs
 
 See https://www.tcl-lang.org/man/tcl/ThreadCmd/thread.htm and https://wiki.tcl-lang.org/page/thread
-You have an example at `./tcl-examples/test-vm-2-threads.tcl` and `./tcl-examples/thread-pool.tcl` for the use of pool.
+You have an example at `./examples/test-vm-2-threads.tcl` and `./examples/thread-pool.tcl` for the use of pool.
 
 #### Installation
 
