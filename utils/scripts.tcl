@@ -79,3 +79,27 @@ set tokenize_file_to_xml_script {
     }
   }
 }
+
+# parse token xml file to xml tree
+set parse_token_xml_file_script {
+  source "[file normalize .]/utils/imports.tcl"
+
+  proc parse_token_xml_file {token_xml_file_path output_dir} {
+    puts "PARSING TOKEN XML FILE: $token_xml_file_path\n"
+
+    # gets the tokens from 
+    set tokens_doc [xml_file_to_dom_doc $token_xml_file_path]
+
+    # create a coroutine to generate tokens from the XML document
+    coroutine tokens_generator xml_to_tokens_generator $tokens_doc
+    # initialize the tokens generator - usesed in parers
+    init_tokens_generator tokens_generator
+
+    set doc [::dom::DOMImplementation create]
+    # parse file to doc
+    parse $doc
+
+    # write to output file
+    write_dom_doc_to_file $doc "$output_dir/[token_file_name_to_parsed_file_name $token_xml_file_path]"
+  }
+}
