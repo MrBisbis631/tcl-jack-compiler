@@ -8,6 +8,7 @@ package require Ttrace
 # modules
 source "[file normalize .]/vm-2-hack/vm-2-hack.tcl"
 source "[file normalize .]/tokenizer/tokenizer.tcl"
+source "[file normalize .]/parser/parser.tcl"
 
 #  utilities
 source "[file normalize .]/utils/files.tcl"
