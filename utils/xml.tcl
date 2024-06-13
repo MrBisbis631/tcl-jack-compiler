@@ -28,6 +28,8 @@ proc create_xml_node {parent name} {
 
 # Return the tokens of an XML document
 proc xml_to_tokens_generator {doc} {
+  # yield empty forr init  
+  yield "" 
   foreach token [::dom::selectNode $doc /tokens/*] {
     set value [string trim [$token stringValue]]
     set type [$token cget -nodeName]
