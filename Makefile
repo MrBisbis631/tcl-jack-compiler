@@ -43,3 +43,12 @@ ex4.1:
 		if [ -z "$$dir" ]; then echo "Invalid choice"; exit 1; fi; \
 		echo "You chose: $$dir"; \
 		tclsh ./tcl-examples/test-file-tokenizing.tcl $$dir
+
+ex4.2: 
+	-@echo "Choose directory to transpile:"
+	-@ls data/ex4 | awk '{print "  " NR ": " $$0}'
+	-@read -p "Enter number: " dir_number; \
+		dir=$$(ls data/ex4 | sed -n "$$dir_number p"); \
+		if [ -z "$$dir" ]; then echo "Invalid choice"; exit 1; fi; \
+		echo "You chose: $$dir"; \
+		tclsh ./tcl-examples/parser-example.tcl $$dir
