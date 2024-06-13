@@ -108,6 +108,11 @@ proc parameter_list_parser {parent} {
     return $node
   }
 
+  # type
+  type_parser $node
+  # varName
+  name_parser $node
+
   # (',' type varName)*
   while {[get_current_token_value] eq ","} {
     # ','
