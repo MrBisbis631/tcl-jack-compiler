@@ -61,6 +61,15 @@ proc is_expression {value} {
   return [regexp "$number_regex|$string_regex|$keyword_regex|$variable_regex|$unary_op_regex|$open_parenthesis_regex" $value]
 }
 
+# check if the current token is a indntifier
 proc is_identifier {value} {
   return [regexp {^[a-zA-Z_][a-zA-Z0-9_]*$} $value]
+}
+
+# check whether the current token is a type
+proc is_type {value} {
+  if {[regexp {^(int|char|boolean)$} $value] || [is_identifier $value]} {
+    return 1
+  } 
+  return 0
 }
