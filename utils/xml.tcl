@@ -38,3 +38,13 @@ proc xml_to_tokens_generator {doc} {
 
   yield "\0"
 }
+
+# returns the value of the first node with a given name
+proc first_node_value {node name} {
+  set first_node [::dom::selectNode $node $name]
+  if {[llength $first_node] == 0} {
+    return ""
+  }
+  # TODO remove trim
+  return [string trim [[lindex $first_node 0] stringValue]]
+}
