@@ -65,3 +65,12 @@ proc token_file_name_to_parsed_file_name {filepath} {
   set filename [filename_no_extention $filepath]
   return "[string range $filename 0 [expr [string last "T" $filename] - 1]].xml"
 }
+
+# inject jack-stdlib to directory
+proc inject_jack_stdlib {dir_path} {
+  set jack_stdlib_path "[file normalize .]/data/jack-stdlib"
+  set jack_stdlib_files [glob -nocomplain -directory $jack_stdlib_path *]
+  foreach lib_file $jack_stdlib_files {
+    file copy -force $lib_file $dir_path
+  }
+}
