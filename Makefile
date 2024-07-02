@@ -22,6 +22,9 @@ read-tokens:
 inject-stdlib:
 	tclsh ./examples/inject-stdlib.tcl
 
+test-parsed-to-vm:
+	tclsh ./examples/test-parsed-to-vm.tcl
+
 # Exeersises
 
 ex0:
