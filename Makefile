@@ -19,6 +19,9 @@ file-tokenizing:
 read-tokens:
 	tclsh ./examples/read-tokens.tcl
 
+inject-stdlib:
+	tclsh ./examples/inject-stdlib.tcl
+
 # Exeersises
 
 ex0:
