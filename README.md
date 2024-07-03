@@ -79,3 +79,53 @@ and test the installation using `tclsh` command.
 ```tcl
  package require Thread
 ```
+
+### TDOM 0.9.1
+
+#### Description
+
+TDOM is a package that provides a DOM (Document Object Model) for the Tcl scripting language. It is based on the Expat XML parser, but provides a higher-level, more Tcl-friendly interface.
+
+#### Installation
+
+run the following commands:
+
+```bash
+sudo apt install tcllib tdom
+```
+
+#### Example & Usage
+
+```tcl
+package require tdom
+
+# Create a new XML document with a root element
+set doc [dom createDocument root]
+
+# Access the root element
+set root [$doc documentElement]
+
+# Create a child element with attributes
+set child [$doc createElement child]
+
+# Add attributes to the child element
+$child setAttribute attr1 "value1"
+$child setAttribute attr2 "value2"
+
+# Append the child element to the root element
+$root appendChild $child
+
+# Create another child element with attributes
+set anotherChild [$doc createElement anotherChild]
+$anotherChild setAttribute id "1234"
+$anotherChild setAttribute name "example"
+
+# Append the new child element to the root element
+$root appendChild $anotherChild
+
+# Serialize the document to a string
+set xmlString [$doc asXML]
+
+# Print the XML string
+puts $xmlString
+```

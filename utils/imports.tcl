@@ -3,6 +3,7 @@
 # packages
 package require xml 3.2
 package require Thread 2.8
+package require tdom
 package require Ttrace
 
 # modules
