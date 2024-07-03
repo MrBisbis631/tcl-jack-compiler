@@ -1,6 +1,8 @@
 # Transpile parsed XML doc to vm code
 
 source "[file normalize .]/jack-2-vm/program-structure.tcl"
+source "[file normalize .]/jack-2-vm/statements.tcl"
+source "[file normalize .]/jack-2-vm/expressions.tcl"
 
 # Transpile a single jack file to vm code
 proc jack_to_vm {doc} {
