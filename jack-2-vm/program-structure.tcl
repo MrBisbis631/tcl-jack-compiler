@@ -47,11 +47,16 @@ proc class_var_dec_node_to_vm {node class_name} {
 proc subroutine_dec_node_to_vm {node class_name} {
   set vm_code ""
 
+  set param_list_node [::dom::selectNode $node parameterList]
+
+
   set subroutine_kind [first_node_value $node keyword]
   set subroutine_type [first_node_value $node type]
   set subroutine_name [first_node_value $node identifier]
 
-  set vm_code "function $class_name.$subroutine_name 0\n"
+
+  set identifier_nodes [::dom::selectNode $param_list_node identifier]
+  set vm_code "function $class_name.$subroutine_name [llength $identifier_nodes]\n"
 
   return $vm_code
 }
