@@ -21,8 +21,14 @@ proc create_xml_leaf {parent name value} {
 }
 
 # Create an XML node with a given name
-proc create_xml_node {parent name} {
+proc create_xml_node {parent name {attributes {}}} {
   set node [::dom::document createElement $parent $name]
+  if {$attributes != ""} {
+    foreach {key value} $attributes {
+      ::dom::element setAttribute $node $key $value
+    }
+  }
+
   return $node
 }
 
@@ -46,4 +52,20 @@ proc first_node_value {node name} {
     return ""
   }
   return [[lindex $first_node 0] stringValue]
+}
+
+# Return the nodes of an XML document as a generator
+proc xml_nodes_generator {nodes} {
+  yield ""
+  foreach node $nodes {
+    yield $node
+  }
+  yield "\0"
+}
+
+# Add attributes to an XML node from an associative list
+proc add_attributes {node list} {
+  foreach {key value} [array get $list] {
+    ::dom::element setAttribute $node $key $value
+  }
 }
