@@ -48,9 +48,9 @@ proc prossess_terminal {parent type value} {
   if {$token_value != $value} {
     error "PARSER ERROR: expected $value but got $token_value"
   }
-  # TODO remove spaces
-  create_xml_leaf $parent $type " $value "
+  set leaf [create_xml_leaf $parent $type $value]
   get_next_token
+  return $leaf
 }
 
 # check if the current token is an operator
