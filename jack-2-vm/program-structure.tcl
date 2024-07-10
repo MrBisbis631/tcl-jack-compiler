@@ -61,7 +61,7 @@ proc subroutine_dec_to_vm {node} {
   set subroutine_name [[subroutine_dec_gen] stringValue]
 
   # create subroutine scope
-  set subroutine_record [create_scope $subroutine_name $subroutine_type $returns]
+  set subroutine_scope [create_scope $subroutine_name $subroutine_type $returns]
 
   # method has an argument this
   if {$subroutine_type == "method"} {
@@ -85,21 +85,20 @@ proc subroutine_dec_to_vm {node} {
   # subroutineBody
   # varDec*
   foreach var_dec_node [::dom::selectNode $node subroutineBody/varDec] {
-    append vm_code [var_dec_to_vm $var_dec_node]
+    append vm_code [var_dec_to_vm $var_dec_node $subroutine_name]
   }
 
   # statements
 
-  set args_count [llength [::dom::selectNode $subroutine_record *]]
+  set args_count [llength [::dom::selectNode $subroutine_scope *]]
 
   # append vm_code [parameter_list_to_vm $parameter_list_node]
   return "function [get_scops_class].$subroutine_name $args_count\n"
 }
 
-proc var_dec_to_vm {node} {
+proc var_dec_to_vm {node subroutine_name} {
   coroutine var_dec_gen xml_nodes_generator [::dom::selectNode $node *]
-
-  set subroutine_name [get_scops_class]
+  var_dec_gen
   # var
   set kind "var"
   # type
@@ -110,11 +109,12 @@ proc var_dec_to_vm {node} {
 
   # (, varName)*
   while {[set node [var_dec_gen]] != "\0"} {
+    if {$node == "" || [$node cget -nodeName] == "symbol"} {
+      continue
+    }
     set tok_value [$node stringValue]
     set tok_type [$node cget -nodeName]
-    if {$tok_type == "identifier"} {
-      create_record $subroutine_name $tok_value $type $kind
-    }
+    create_record $subroutine_name $tok_value $type $kind
   }
 
   return ""
