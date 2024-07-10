@@ -27,6 +27,7 @@ proc create_scope {name {type "none"} {returns "none"}} {
   global scops
   set scope [::dom::document createElement $scops $name]
   ::dom::element setAttribute $scope type $type
+  ::dom::element setAttribute $scope returns $returns
   ::dom::element setAttribute $scope static_count 0
   ::dom::element setAttribute $scope field_count 0
   ::dom::element setAttribute $scope argument_count 0
