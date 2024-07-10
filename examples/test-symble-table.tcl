@@ -25,12 +25,11 @@ set record3_8 [create_record "scope3" "record3_8" "boolean" "argument"]
 set record3_9 [create_record "scope3" "record3_9" "char" "local"]
 set record3_10 [create_record "scope3" "record3_10" "float" "var"]
 
-# Print the XML representation of the document
-puts "XML representation of the document:\n"
-puts [$doc asXML]
-
 # Print the records created in the scopes
 puts "\nRecords created in the scopes:\n"
 puts [get_record "scope1" "record1_1"]
 puts [get_record "scope1" "record1_2"]
 puts [get_record "scope2" "record2_1"]
+
+# use debug
+dump_symble_table

@@ -1,12 +1,12 @@
 # Symbol Table Utils for scope management in Jack Compiler
 
-set doc [dom createDocument scops]
-set scops [$doc documentElement]
+set __symble_table_doc [dom createDocument scops]
+set scops [$__symble_table_doc documentElement]
 
 # Create a scope
 proc create_scope {name} {
-  global scops doc
-  set scope [$doc createElement $name]
+  global scops __symble_table_doc
+  set scope [$__symble_table_doc createElement $name]
   $scope setAttribute static_count 0
   $scope setAttribute field_count 0
   $scope setAttribute argument_count 0
@@ -18,8 +18,8 @@ proc create_scope {name} {
 
 # get scope node
 proc get_scope_records {name} {
-  global doc
-  set scope [$doc selectNodes /scops/$name]
+  global __symble_table_doc
+  set scope [$__symble_table_doc selectNodes /scops/$name]
 
   set records_list {}
 
@@ -36,9 +36,9 @@ proc get_scope_records {name} {
 
 # Create a record in a scope
 proc create_record {scope_name name type kind} {
-  global doc
-  set scope [$doc selectNodes /scops/$scope_name]
-  set record [$doc createElement $name]
+  global __symble_table_doc
+  set scope [$__symble_table_doc selectNodes /scops/$scope_name]
+  set record [$__symble_table_doc createElement $name]
 
   # get count set the index  on record and increment it on scope
   set count 0
@@ -77,13 +77,22 @@ proc create_record {scope_name name type kind} {
 
 # Get a record from a scope in the format {type kind index}
 proc get_record {scope_name name} {
-  global doc
+  global __symble_table_doc
   # fetch the record from the scope
-  set record [$doc selectNodes /scops/$scope_name/$name]
+  set record [$__symble_table_doc selectNodes /scops/$scope_name/$name]
   # gets the attributes of the record
   set type [$record getAttribute type]
   set kind [$record getAttribute kind]
   set index [$record getAttribute index]
 
   return [list $type $kind $index]
+}
+
+
+# Dump the symble table - used for debugging
+proc dump_symble_table {} {
+  global __symble_table_doc
+  puts "---- symble Table -----"
+  puts [$__symble_table_doc asXML]
+  puts "--- end ymble Table ---"
 }
