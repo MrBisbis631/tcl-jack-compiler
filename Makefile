@@ -54,10 +54,19 @@ ex4.1:
 		tclsh ./examples/test-file-tokenizing.tcl $$dir
 
 ex4.2: 
-	-@echo "Choose directory to transpile:"
+	-@echo "Choose directory to parse:"
 	-@ls data/ex4 | awk '{print "  " NR ": " $$0}'
 	-@read -p "Enter number: " dir_number; \
 		dir=$$(ls data/ex4 | sed -n "$$dir_number p"); \
 		if [ -z "$$dir" ]; then echo "Invalid choice"; exit 1; fi; \
 		echo "You chose: $$dir"; \
 		tclsh ./examples/parser-example.tcl $$dir
+
+ex5: 
+	-@echo "Choose directory to compile:"
+	-@ls data/ex5 | awk '{print "  " NR ": " $$0}'
+	-@read -p "Enter number: " dir_number; \
+		dir=$$(ls data/ex5 | sed -n "$$dir_number p"); \
+		if [ -z "$$dir" ]; then echo "Invalid choice"; exit 1; fi; \
+		echo "You chose: $$dir"; \
+		tclsh ./examples/parsed-tree-to-vm.tcl $$dir
