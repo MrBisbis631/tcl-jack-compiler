@@ -9,7 +9,7 @@ package require Ttrace
 source "[file normalize .]/vm-2-hack/vm-2-hack.tcl"
 source "[file normalize .]/tokenizer/tokenizer.tcl"
 source "[file normalize .]/parser/parser.tcl"
-# source "[file normalize .]/jack-2-vm/jack-2-vm.tcl"
+source "[file normalize .]/jack-2-vm/jack-2-vm.tcl"
 
 #  utilities
 source "[file normalize .]/utils/files.tcl"

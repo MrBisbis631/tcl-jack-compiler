@@ -3,10 +3,30 @@
 set __symble_table_doc [::dom::DOMImplementation create]
 set scops [::dom::document createElement $__symble_table_doc scops]
 
+# clear the symble table
+proc clear_symble_table {} {
+  global __symble_table_doc scops
+  set __symble_table_doc [::dom::DOMImplementation create]
+  set scops [::dom::document createElement $__symble_table_doc scops]
+}
+
+# Set the class of the scops element
+proc set_scops_class {class_name} {
+  global scops
+  ::dom::element setAttribute $scops class $class_name
+}
+
+# Get the class of the scops element
+proc get_scops_class {} {
+  global scops
+  return [::dom::element getAttribute $scops class]
+}
+
 # Create a scope
-proc create_scope {name} {
+proc create_scope {name {type "none"} {returns "none"}} {
   global scops
   set scope [::dom::document createElement $scops $name]
+  ::dom::element setAttribute $scope type $type
   ::dom::element setAttribute $scope static_count 0
   ::dom::element setAttribute $scope field_count 0
   ::dom::element setAttribute $scope argument_count 0
