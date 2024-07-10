@@ -3,60 +3,119 @@
 # Convert a class node to VM code
 proc class_node_to_vm {class_node} {
   set class_vm_code ""
-  
+
+  # init class scope
+  clear_symble_table
   set class_name [first_node_value $class_node identifier]
+  set_scops_class $class_name
+  set class_scope [create_scope $class_name "class"]
 
   # classVarDec*
-  set class_var_dec_nodes [::dom::selectNode $class_node classVarDec]
-
-  foreach var_dec_node $class_var_dec_nodes {
-    set vm_code [class_var_dec_node_to_vm $var_dec_node $class_name]
-    append class_vm_code $vm_code
+  foreach class_var_dec_node [::dom::selectNode $class_node classVarDec] {
+    append class_vm_code [class_var_dec_to_vm $class_var_dec_node]
   }
 
   # subroutineDec*
-  set subroutine_dec_nodes [::dom::selectNode $class_node subroutineDec]
-
-  foreach subroutine_dec_node $subroutine_dec_nodes {
-    set vm_code [subroutine_dec_node_to_vm $subroutine_dec_node $class_name]
-    append class_vm_code $vm_code
+  foreach subroutine_dec_node [::dom::selectNode $class_node subroutineDec] {
+    append class_vm_code [subroutine_dec_to_vm $subroutine_dec_node]
   }
+
+  dump_symble_table
 
   return $class_vm_code
 }
 
-proc class_var_dec_node_to_vm {node class_name} {
-  set vm_code ""
+proc class_var_dec_to_vm {node} {
+  coroutine class_var_dec_gen xml_nodes_generator [::dom::selectNode $node *]
 
-  set var_kind [first_node_value $node keyword]
-  set var_type [first_node_value $node type]
-  set var_name [first_node_value $node identifier]
+  set class_name [get_scops_class]
+  # static | field
+  set kind [[class_var_dec_gen] stringValue]
+  # type
+  set type [[class_var_dec_gen] stringValue]
+  # varName
+  set name [[class_var_dec_gen] stringValue]
+  create_record $class_name $name $type $kind
 
-  set vm_code "push constant 0\n"
-  if {$var_kind == "field"} {
-    append vm_code "this push constant 0\n"
-    append vm_code "this pop pointer 0\n"
-  } else {
-    append vm_code "pop static $class_name.$var_name\n"
+  # (, varName)*
+  while {[set node [class_var_dec_gen]] != "\0"} {
+    set tok_value [$node stringValue]
+    set tok_type [$node cget -nodeName]
+    if {$tok_type == "identifier"} {
+      create_record $class_name $tok_value $type $kind
+    }
   }
 
-  return $vm_code
+  return ""
 }
 
-
-proc subroutine_dec_node_to_vm {node class_name} {
+proc subroutine_dec_to_vm {node} {
   set vm_code ""
+  coroutine subroutine_dec_gen xml_nodes_generator [::dom::selectNode $node *]
 
-  set param_list_node [::dom::selectNode $node parameterList]
+  # constructor | function | method
+  set subroutine_type [[subroutine_dec_gen] stringValue]
+  # void | type
+  set returns [[subroutine_dec_gen] stringValue]
+  # subroutineName
+  set subroutine_name [[subroutine_dec_gen] stringValue]
 
+  # create subroutine scope
+  set subroutine_record [create_scope $subroutine_name $subroutine_type $returns]
 
-  set subroutine_kind [first_node_value $node keyword]
-  set subroutine_type [first_node_value $node type]
-  set subroutine_name [first_node_value $node identifier]
+  # method has an argument this
+  if {$subroutine_type == "method"} {
+    create_record $subroutine_name "this" [get_scops_class] "argument"
+  }
 
+  # parameterList
+  set parameter_list_node [::dom::selectNode $node parameterList/*]
+  # update symble table with the parameters
+  for {set param_node [coroutine nodes_gen xml_nodes_generator $parameter_list_node]} \
+  {$param_node != "\0"} \
+  {set param_node [nodes_gen]} {
+    if {$param_node == "" || [$param_node cget -nodeName] == "symbol"} {
+      continue
+    }
+    set type [$param_node stringValue]
+    set value [[nodes_gen] stringValue]
+    create_record $subroutine_name $value $type "argument"
+  }
 
-  set identifier_nodes [::dom::selectNode $param_list_node identifier]
-  set vm_code "function $class_name.$subroutine_name [llength $identifier_nodes]\n"
+  # subroutineBody
+  # varDec*
+  foreach var_dec_node [::dom::selectNode $node subroutineBody/varDec] {
+    append vm_code [var_dec_to_vm $var_dec_node]
+  }
 
-  return $vm_code
+  # statements
+
+  set args_count [llength [::dom::selectNode $subroutine_record *]]
+
+  # append vm_code [parameter_list_to_vm $parameter_list_node]
+  return "function [get_scops_class].$subroutine_name $args_count\n"
+}
+
+proc var_dec_to_vm {node} {
+  coroutine var_dec_gen xml_nodes_generator [::dom::selectNode $node *]
+
+  set subroutine_name [get_scops_class]
+  # var
+  set kind "var"
+  # type
+  set type [[var_dec_gen] stringValue]
+  # varName
+  set name [[var_dec_gen] stringValue]
+  create_record $subroutine_name $name $type $kind
+
+  # (, varName)*
+  while {[set node [var_dec_gen]] != "\0"} {
+    set tok_value [$node stringValue]
+    set tok_type [$node cget -nodeName]
+    if {$tok_type == "identifier"} {
+      create_record $subroutine_name $tok_value $type $kind
+    }
+  }
+
+  return ""
 }

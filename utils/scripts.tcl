@@ -102,3 +102,21 @@ set parse_token_xml_file_script {
     write_dom_doc_to_file $doc "$output_dir/[token_file_name_to_parsed_file_name $token_xml_file_path]"
   }
 }
+
+# parsed tree XML file to VM file
+set jack_2_vm_file_script {
+  source "[file normalize .]/utils/imports.tcl"
+
+  proc jack_2_vm_file {parsed_tree_xml_file_path output_dir} {
+    puts "PARSING TREE XML FILE: $parsed_tree_xml_file_path\n"
+
+    set doc [xml_file_to_dom_doc $parsed_tree_xml_file_path]
+
+    set vm_code [jack_to_vm $doc] 
+
+    # write to output file
+    set o_fd [open "$output_dir/[filename_no_extention $parsed_tree_xml_file_path].vm" "w"]
+    puts $o_fd $vm_code
+    close $o_fd
+  }
+}
