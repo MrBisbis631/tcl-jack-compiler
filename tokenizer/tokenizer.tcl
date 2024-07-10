@@ -12,10 +12,6 @@ proc tokenize {code} {
   set tokens {}
   set pos 0
 
-
-  # remove comments
-  set code [regsub -all {//.*|/\*\*.*\*/} $code {}]
-
   while {[regexp -indices -start $pos $jack_pattern $code match]} {
     # extract token with the general pattren
     set start [lindex $match 0]
@@ -41,9 +37,6 @@ proc tokenize_generator {code} {
   global jack_pattern
 
   set pos 0
-
-  # remove comments
-  set code [regsub -all {//.*|/\*\*.*\*/} $code {}]
 
   while {[regexp -indices -start $pos $jack_pattern $code match]} {
     # extract token with the general pattren

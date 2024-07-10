@@ -48,7 +48,7 @@ proc xml_file_to_dom_doc {xml_file_path} {
   return $doc
 }
 
-# get files name by the postfix 
+# get files name by the postfix
 proc get_files_name_by_postfix {dir_path postfix} {
   return [glob -nocomplain -directory $dir_path *$postfix]
 }
@@ -73,4 +73,33 @@ proc inject_jack_stdlib {dir_path} {
   foreach lib_file $jack_stdlib_files {
     file copy -force $lib_file $dir_path
   }
+}
+
+# Generate lines from a file for coroutines
+proc jack_code_generator {file_path} {
+  set fd [open $file_path r]
+  while {[gets $fd line] >= 0} {
+    set line [string trim [regsub -all {//.*|/\*\*.*\*/} $line {}]]
+
+    # skip empty lines
+    if {$line == ""} {
+      continue
+    }
+
+    # handle comment block
+    if {[regexp {^/\*\*} $line]} {
+      for {set line [gets $fd]} {$line != "\0"} {set line [gets $fd]} {
+        # skip until end of comment block
+        if {[regexp {\*\/$} $line]} {
+          break
+        }
+      }
+      # skip the comment block
+      continue
+    }
+
+    yield $line
+  }
+  close $fd
+  yield "\0"
 }

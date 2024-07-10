@@ -64,14 +64,13 @@ set tokenize_file_to_xml_script {
       set root [::dom::document createElement $doc "tokens"]
 
       # tokenize each line of the file
-      for {set line [coroutine line_generator generate_lines $jack_file_path]} {$line != "\0"} {set line [line_generator]} {
+      for {set line [coroutine line_generator jack_code_generator $jack_file_path]} {$line != "\0"} {set line [line_generator]} {
         # append every token to the xml file
         foreach token [tokenize $line] {
           token_to_xml_node $token $root
         }
 
       }
-
       # finaly append the root to the document
       puts $o_fd [::dom::DOMImplementation serialize $doc -indent 1]
     } finally {
@@ -87,7 +86,7 @@ set parse_token_xml_file_script {
   proc parse_token_xml_file {token_xml_file_path output_dir} {
     puts "PARSING TOKEN XML FILE: $token_xml_file_path\n"
 
-    # gets the tokens from 
+    # gets the tokens from the xml file
     set tokens_doc [xml_file_to_dom_doc $token_xml_file_path]
 
     # create a coroutine to generate tokens from the XML document
