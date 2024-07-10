@@ -1,3 +1,30 @@
+### Project structure
+**File Structure**
+
+The project directory is organized as follows:
+
+- `data/`: Contains various example directories (`ex0/`, `ex1/`, `ex2/`, `ex4/`, `ex5/`) and the `jack-stdlib/` directory which holds the standard library for the Jack language.
+
+- `examples/`: Includes example Tcl scripts demonstrating different functionalities such as `ex0.tcl`, `inject-stdlib.tcl`, `parsed-tree-to-vm.tcl`, `parser-example.tcl`, `read-tokens.tcl`, `simple-tokenize-example.tcl`, `tclxml.tcl`, `test-file-tokenizing.tcl`, `test-parsed-to-vm.tcl`, `test-symbol-table.tcl`, `test-vm-2-hack-stack.tcl`, `test-vm-2-hack-threads.tcl`, and `thread-pool.tcl`.
+
+- `jack-2-vm/`: Contains scripts related to converting Jack language to VM code, such as `expressions.tcl`, `jack-2-vm.tcl`, and `program-structure.tcl`.
+
+- `packages/`: Placeholder for additional packages required by the project.
+
+- `parser/`: Contains scripts related to parsing functionality.
+
+- `target/`: Directory for storing generated output files.
+
+- `tokenizer/`: Contains scripts related to tokenizing functionality.
+
+- `tools/`: Contains utility scripts and tools for the project.
+
+- `utils/`: Contains utility scripts, such as `files.tcl` for file operations.
+
+- `vm-2-hack/`: Contains scripts related to converting VM code to Hack assembly language.
+
+This file structure helps in organizing the project files and scripts based on their functionality and usage.
+
 ### TCL installation
 
 From Ubuntu 20.04 **and not latest** versions - You can't install TclXML 3.2 on Ubuntu 22._ or 24._.
@@ -12,6 +39,12 @@ sudo apt-get install -y tcllib
 sudo apt-get install libxml2-dev
 sudo apt-get install libxslt-dev
 ```
+
+### Parsing Strategy
+
+We use LR with RD and iteration eliminations parsing strategy, we use the `tclxml` package as the tree data structure, in every call to the next parsing rule we send the `parent` or the current `node`. In the end we return the root node of the tree.
+The conversion to an xml file is done by the `xml` package.
+
 
 ## Packages
 
@@ -84,6 +117,10 @@ and test the installation using `tclsh` command.
 
 #### Description
 
+**Note** We didn't use this package in our project, due to conflicts with the `TclXML` package. We choose to use `TclXML` over `TDOM` because in `TlXML` you don't have to pass the `document` as a parameter to the `xml` commands.
+
+````tcl
+
 TDOM is a package that provides a DOM (Document Object Model) for the Tcl scripting language. It is based on the Expat XML parser, but provides a higher-level, more Tcl-friendly interface.
 
 #### Installation
@@ -92,7 +129,7 @@ run the following commands:
 
 ```bash
 sudo apt install tcllib tdom
-```
+````
 
 #### Example & Usage
 
