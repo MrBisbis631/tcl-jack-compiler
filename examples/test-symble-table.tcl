@@ -2,6 +2,8 @@
 
 source "[file normalize .]/utils/imports.tcl"
 
+set_scops_class "Main"
+
 # Create multiple scopes with multiple records
 set scope1 [create_scope "scope1"]
 set record1_1 [create_record "scope1" "record1_1" "int" "static"]
@@ -33,3 +35,5 @@ puts [get_record "scope2" "record2_1"]
 
 # use debug
 dump_symble_table
+
+puts "The class: [get_scops_class]"

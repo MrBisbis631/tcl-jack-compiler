@@ -2,7 +2,7 @@
 
 source "[file normalize .]/utils/imports.tcl"
 
-set file_path "[file normalize .]/data/ex4/Square/Square.xml"
+set file_path "[file normalize .]/target/ex4.2/Square/Square.xml"
 
 set doc [xml_file_to_dom_doc $file_path]
 
