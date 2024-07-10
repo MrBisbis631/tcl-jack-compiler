@@ -74,6 +74,9 @@ foreach tree_file $tree_files {
 
 # -------------- cleanup ----------------------------
 
+# 
+# wait_for_pool_to_finish $pool
+
 # # remove files that are not .vm
 # foreach file [glob -nocomplain -directory $output_dir -type f -tails *] {
 #   if {[file extension $file] ne ".vm"} {
