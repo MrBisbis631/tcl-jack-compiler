@@ -90,6 +90,38 @@ proc get_record {scope_name name} {
 }
 
 
+# Get a record from a scope in the format {type kind index}
+proc get_record_as_dict {scope_name name} {
+  global __symble_table_doc
+  # fetch the record from the scope
+  set record [::dom::selectNode $__symble_table_doc /scops/$scope_name/$name]
+
+  # gets the attributes of the record
+  set type [::dom::element getAttribute $record type]
+  set kind [::dom::element getAttribute $record kind]
+  set index [::dom::element getAttribute $record index]
+
+  return [dict create type $type kind $kind index $index]
+}
+
+# Get the scope as a dict
+proc get_scope_as_dict {scope_name} {
+  global __symble_table_doc
+  # fetch the record from the scope
+  set scope [::dom::selectNode $__symble_table_doc /scops/$scope_name]
+
+  # gets the attributes of the record
+  set type [::dom::element getAttribute $scope type]
+  set returns [::dom::element getAttribute $scope returns]
+  set static_count [::dom::element getAttribute $scope static_count]
+  set field_count [::dom::element getAttribute $scope field_count]
+  set argument_count [::dom::element getAttribute $scope argument_count]
+  set local_count [::dom::element getAttribute $scope local_count]
+  set var_count [::dom::element getAttribute $scope var_count]
+
+  return [dict create type $type returns $returns static_count $static_count field_count $field_count argument_count $argument_count local_count $local_count var_count $var_count]
+}
+
 # Dump the symble table - used for debugging
 proc dump_symble_table {} {
   global __symble_table_doc
