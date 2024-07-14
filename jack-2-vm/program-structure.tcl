@@ -12,7 +12,7 @@ proc class_node_to_vm {class_node} {
 
   # classVarDec*
   foreach class_var_dec_node [::dom::selectNode $class_node classVarDec] {
-    append class_vm_code [class_var_dec_to_vm $class_var_dec_node]
+    class_var_dec_to_vm $class_var_dec_node
   }
 
   # subroutineDec*
@@ -25,6 +25,7 @@ proc class_node_to_vm {class_node} {
   return $class_vm_code
 }
 
+# populate the symble table with the class variables
 proc class_var_dec_to_vm {node} {
   coroutine class_var_dec_gen xml_nodes_generator [::dom::selectNode $node *]
 
@@ -45,12 +46,10 @@ proc class_var_dec_to_vm {node} {
       create_record $class_name $tok_value $type $kind
     }
   }
-
-  return ""
 }
 
+# Convert a subroutineDec node to VM code
 proc subroutine_dec_to_vm {node} {
-  set vm_code ""
   coroutine subroutine_dec_gen xml_nodes_generator [::dom::selectNode $node *]
 
   # constructor | function | method
@@ -85,17 +84,17 @@ proc subroutine_dec_to_vm {node} {
   # subroutineBody
   # varDec*
   foreach var_dec_node [::dom::selectNode $node subroutineBody/varDec] {
-    append vm_code [var_dec_to_vm $var_dec_node $subroutine_name]
+    var_dec_to_vm $var_dec_node $subroutine_name
   }
 
-  # statements
-
   set args_count [llength [::dom::selectNode $subroutine_scope *]]
+  set function_name "[get_scops_class].$subroutine_name $args_count"
+  set statments_vm_code [statements_to_vm [::dom::selectNode $node subroutineBody/statements] $subroutine_name]
 
-  # append vm_code [parameter_list_to_vm $parameter_list_node]
-  return "function [get_scops_class].$subroutine_name $args_count\n"
+  return "function $function_name $args_count\n$statments_vm_code\n"
 }
 
+# Populate the symble table with the parameters
 proc var_dec_to_vm {node subroutine_name} {
   coroutine var_dec_gen xml_nodes_generator [::dom::selectNode $node *]
   var_dec_gen
@@ -116,6 +115,4 @@ proc var_dec_to_vm {node subroutine_name} {
     set tok_type [$node cget -nodeName]
     create_record $subroutine_name $tok_value $type $kind
   }
-
-  return ""
 }
