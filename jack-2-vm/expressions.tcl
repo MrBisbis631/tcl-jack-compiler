@@ -1,23 +1,27 @@
 # Function to handle expressions
-proc handle_expression {root} {
+proc expression_to_vm {node scope} {
     set skip_node 0
     set vm_code ""
-    foreach term [$root childNodes] {
+    foreach current_node [$node childNodes] {
         if {$skip_node == 1} {
+            set $skip_node 0
             continue
         }
-        set term_node_name [$term nodeName]
-        puts $term_node_name
-        if {[$term nodeName] eq "term"} {
-           append vm_code [handle_term $term]
-        } elseif {[$term text] in {+ - & | < > =}} {
-            set next_term [$term nextSibling]
-            set term_expr [handle_term $next_term]
-            set next_node_name [$next_term nodeName]
+        set current_node_name [$current_node nodeName]
+        puts $current_node_name
+        if {[$current_node nodeName] eq "term"} {
+           append vm_code [handle_term $current_node]
+        } elseif {[$current_node nodeName] eq "expression"} {
+            
+           append vm_code [handle_expression $current_node]
+        } elseif {[$current_node text] in {+ - & | < > =}} {
+            set next_node [$current_node nextSibling]
+            set next_node_code [handle_term $next_node]
+            set next_node_name [$next_node nodeName]
             puts "next node:"
             puts $next_node_name
             set symbol_expr ""
-            switch [$term text] {
+            switch [$current_node text] {
                 "+" {set symbol_expr "add\n"}
                 "-" {set symbol_expr "sub\n"}
                 "&" {set symbol_expr "and\n"}
@@ -26,7 +30,7 @@ proc handle_expression {root} {
                 ">" {set symbol_expr "gt\n"}
                 "=" {set symbol_expr "eq\n"}
             }
-            append vm_code $term_expr
+            append vm_code $next_node_code
             append vm_code $symbol_expr
             set skip_node 1
         }
@@ -51,19 +55,21 @@ proc handle_term {term} {
                 append vm_code "push $term_content 0\n"
             } else {
                 # Assume it's a variable or field
+                #TODO :need to look for it in symbol table 
+                set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
                 append vm_code "push this [expr {$term_content eq "x" ? 0 : $term_content eq "y" ? 1 : 2}]\n"
             }
             return $vm_code
 }
 
-source "[file normalize .]/utils/imports.tcl"
+#source "[file normalize .]/utils/imports.tcl"
 package require tdom
 set filename [lindex $argv 0]
 set xml_fd [open $filename r]
 set xml_content [read $xml_fd]
 close $xml_fd
 set doc [dom parse $xml_content]
-set root [$doc documentElement]
+set node [$doc documentElement]
 #set expr_node [::dom::selectNode $doc /expression]
-set vm_code [handle_expression $root]
+set vm_code [expression_to_vm $node $scope]
 puts $vm_code
