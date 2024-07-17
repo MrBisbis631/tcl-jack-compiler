@@ -30,11 +30,10 @@ proc statements_to_vm {node scope_name} {
 proc let_statement_to_vm {node scope_name} {
   set vm_code ""
   set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
+  set expressions [::dom::selectNode $node expression]
 
-  # handle array index
-  if {[dict get $variable_record type] eq "Array"} {
-    set expressions [::dom::selectNode $node expression]
-
+  # handle array index assingment
+  if {[dict get $variable_record type] eq "Array" && [llength $expressions] == 2} {
     set vm_index_expression [expression_to_vm [lindex $expressions 0] $scope_name]
     set vm_assignment_expression [expression_to_vm [lindex $expressions 1] $scope_name]
 

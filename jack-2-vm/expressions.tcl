@@ -1,24 +1,17 @@
 # expression node to vm code
 proc expression_to_vm {node scope} {
+    puts "expression_to_vm: $node $scope"
     set vm_code ""
     set children [::dom::selectNode $node *]
 
-    switch [llength $children] {
-        # term
-        1 {
-            append vm_code [term_to_vm [lindex $children 0] $scope]
-        }
-        # unaryOp term
-        2 {
-            append vm_code [term_to_vm [lindex $children 1] $scope]
-            append vm_code [unary_op_to_vm [lindex $children 0]]
-        }
-        # term op term
-        3 {
-            append vm_code [term_to_vm [lindex $children 0] $scope]
-            append vm_code [term_to_vm [lindex $children 2] $scope]
-            append vm_code [op_to_vm [lindex $children 1]]
-        }
+    # term
+    append vm_code [term_to_vm [lindex $children 0] $scope]
+
+    # (op term)*
+    for {set i 1} {$i < [llength $children]} {set i [expr {$i + 2}]} {
+        set op_node [lindex $children $i]
+        append vm_code [term_to_vm [lindex $children [expr {$i + 1}]] $scope]
+        append vm_code [op_to_vm $op_node]
     }
 
     return $vm_code
@@ -27,47 +20,77 @@ proc expression_to_vm {node scope} {
 
 proc term_to_vm {node scope_name} {
     set vm_code ""
-    foreach child_node [::dom::selectNode $node *] {
-        set child_node_type [$child_node cget -nodeName]
+    set children [::dom::selectNode $node *]
 
-        switch $child_node_type {
+    set first_node [lindex $children 0]
+    set first_node_type [$first_node cget -nodeName]
 
-                "integerConstant" {
+    switch $first_node_type {
+        "integerConstant" {
+            set val [$first_node stringValue]
+            append vm_code "push constant $val\n"
+        }
+        "stringConstant" {
+            set string_constant [$first_node stringValue]
+            set string_length [string length $string_constant]
 
-                    set val [$child_node stringValue]
-                    append vm_code "push constant $val\n"
+            append vm_code "push constant $string_length\n"
+            append vm_code "call String.new 1\n"
 
+            foreach char [split $string_constant ""] {
+                append vm_code "push constant [scan $char %c]\n"
+                append vm_code "call String.appendChar 2\n"
+            }
+        }
+        "keyword" {
+            append vm_code [keyword_to_vm $first_node]
+        }
+        "symbol" {
+            switch [$first_node stringValue] {
+                "(" {
+                    append vm_code [expression_to_vm [lindex $children 1] $scope_name]
                 }
-                #TODO 
-                  "symbol" {
-
+                "-" {
+                    append vm_code [term_to_vm [lindex $children 1] $scope_name]
+                    append vm_code "neg\n"
                 }
-
-                "stringConstant" {
-                    foreach ch in [$child_node stringValue] {
-                        set ascii_val [char_to_ascii $ch]
-                        append vm_code "push constant $ascii_val\n"
-                    }
+                "~" {
+                    append vm_code [term_to_vm [lindex $children 1] $scope_name]
+                    append vm_code "not\n"
                 }
+            }
+        }
+        "identifier" {
+            set next_node [lindex $children 1]
 
-            #TODO IMPLIMANTION
-                "identifier" {
-                    set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
-                    append vm_code "push ...\n"
-                }
 
-                 "expressionList" {
+            # varName
+            if {[llength $children] == 1} {
+                set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
+                append vm_code "push [dict get $var_record kind] [dict get $var_record index]\n"
 
-                    append vm_code [expression_list_to_vm $node $scope_name]
+                # varName[expression]
+            } elseif {[$next_node stringValue] == "\["} {
+                set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
+                append vm_code "push [dict get $var_record type] [dict get $var_record index]\n"
+                append vm_code [expression_to_vm [lindex children 2] $scope_name]
+                append vm_code "add\n"
+                append vm_code "pop pointer 1\n"
+                append vm_code "push that 0\n"
 
-                }
+                # subroutineCall
+            } else {
+                append vm_code [subroutine_call_to_vm $node $scope_name]
+            }
         }
     }
+
+    return $vm_code
 }
 
 proc subroutine_call_to_vm {node scope_name} {
     set vm_code ""
-    # todo : handle subroutine call
+
     return $vm_code
 }
 
@@ -94,14 +117,6 @@ proc op_to_vm {node} {
         "<" {return "lt\n"}
         ">" {return "gt\n"}
         "=" {return "eq\n"}
-    }
-}
-
-# unaryOp node to vm code
-proc unary_op_to_vm {node} {
-    switch [$node stringValue] {
-        "-" {return "neg\n"}
-        "~" {return "not\n"}
     }
 }
 
