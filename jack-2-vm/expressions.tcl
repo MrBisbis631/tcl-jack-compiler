@@ -1,67 +1,3 @@
-# Function to handle expressions
-proc expression_to_vm {node scope} {
-    set skip_node 0
-    set vm_code ""
-    foreach current_node [$node childNodes] {
-        if {$skip_node == 1} {
-            set $skip_node 0
-            continue
-        }
-        set current_node_name [$current_node nodeName]
-        puts $current_node_name
-        if {[$current_node nodeName] eq "term"} {
-            append vm_code [handle_term $current_node]
-        } elseif {[$current_node nodeName] eq "expression"} {
-
-            append vm_code [handle_expression $current_node]
-        } elseif {[$current_node text] in {+ - & | < > =}} {
-            set next_node [$current_node nextSibling]
-            set next_node_code [handle_term $next_node]
-            set next_node_name [$next_node nodeName]
-            puts "next node:"
-            puts $next_node_name
-            set symbol_expr ""
-            switch [$current_node text] {
-                "+" {set symbol_expr "add\n"}
-                "-" {set symbol_expr "sub\n"}
-                "&" {set symbol_expr "and\n"}
-                "|" {set symbol_expr "or\n"}
-                "<" {set symbol_expr "lt\n"}
-                ">" {set symbol_expr "gt\n"}
-                "=" {set symbol_expr "eq\n"}
-            }
-            append vm_code $next_node_code
-            append vm_code $symbol_expr
-            set skip_node 1
-        }
-    }
-    return $vm_code
-}
-
-proc handle_term {term} {
-    set vm_code ""
-    set term_first_child [[$term firstChild] nodeName]
-    puts $term_first_child
-    set term_content [[$term firstChild] text]
-    puts $term_content
-    if {[string is integer $term_content]} {
-        append vm_code "push constant $term_content\n"
-    } elseif {$term_content in {true false}} {
-        append vm_code "push constant [expr {$term_content eq "true" ? 0 : 1}]\n"
-        if {$term_content eq "true"} {
-            append vm_code "not\n"
-        }
-    } elseif {$term_content in {this that}} {
-        append vm_code "push $term_content 0\n"
-    } else {
-        # Assume it's a variable or field
-        #TODO :need to look for it in symbol table
-        set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
-        append vm_code "push this [expr {$term_content eq "x" ? 0 : $term_content eq "y" ? 1 : 2}]\n"
-    }
-    return $vm_code
-}
-
 # expression node to vm code
 proc expression_to_vm {node scope} {
     set vm_code ""
@@ -91,8 +27,42 @@ proc expression_to_vm {node scope} {
 
 proc term_to_vm {node scope_name} {
     set vm_code ""
-    # todo : handle term
-    return $vm_code
+    foreach child_node [::dom::selectNode $node *] {
+        set child_node_type [$child_node cget -nodeName]
+
+        switch $child_node_type {
+
+                "integerConstant" {
+
+                    set val [$child_node stringValue]
+                    append vm_code "push constant $val\n"
+
+                }
+                #TODO 
+                  "symbol" {
+
+                }
+
+                "stringConstant" {
+                    foreach ch in [$child_node stringValue] {
+                        set ascii_val [char_to_ascii $ch]
+                        append vm_code "push constant $ascii_val\n"
+                    }
+                }
+
+            #TODO IMPLIMANTION
+                "identifier" {
+                    set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
+                    append vm_code "push ...\n"
+                }
+
+                 "expressionList" {
+
+                    append vm_code [expression_list_to_vm $node $scope_name]
+
+                }
+        }
+    }
 }
 
 proc subroutine_call_to_vm {node scope_name} {
