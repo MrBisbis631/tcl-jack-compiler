@@ -32,13 +32,13 @@ proc let_statement_to_vm {node scope_name} {
   set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
 
   # handle array index
-  if {$variable_record(kind) eq "Array"} {
+  if {[dict get $variable_record type] eq "Array"} {
     set expressions [::dom::selectNode $node expression]
 
     set vm_index_expression [expression_to_vm [lindex $expressions 0] $scope_name]
     set vm_assignment_expression [expression_to_vm [lindex $expressions 1] $scope_name]
 
-    append vm_code "push ${variable_record(type)} ${variable_record(index)}\n"
+    append vm_code "push [dict get $variable_record kind] [dict get $variable_record index]\n"
     append vm_code $vm_index_expression
     append vm_code "add\n"
     append vm_code $vm_assignment_expression
@@ -48,7 +48,7 @@ proc let_statement_to_vm {node scope_name} {
     append vm_code "pop that 0\n"
   } else {
     append vm_code [expression_to_vm [::dom::selectNode $node expression] $scope_name]
-    append vm_code "pop ${variable_record(type)} ${variable_record(index)}\n"
+    append vm_code "pop [dict get $variable_record kind] [dict get $variable_record index]\n"
   }
 
   return $vm_code
