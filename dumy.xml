@@ -1,0 +1,10 @@
+<expression>
+    <term>
+        <identifier>x</identifier>
+    </term>
+    <symbol>+</symbol>
+    <term>
+        <identifier>size</identifier>
+    </term>
+</expression>
+       

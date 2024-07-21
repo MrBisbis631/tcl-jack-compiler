@@ -93,6 +93,7 @@ proc subroutine_call_to_vm {node scope_name} {
     set children [::dom::selectNode $node *]
 
     set first_node [lindex $children 0]
+    set first_node_name [$first_node stringValue]
     set first_node_type [$first_node cget -nodeName]
     set next_node [lindex $children 1]
 
@@ -106,14 +107,14 @@ proc subroutine_call_to_vm {node scope_name} {
         set subroutine_name [$first_node stringValue]
         set argument_count [expr {[dict get $subroutine_scop argument_count] +1}]
         append vm_code "call $scope_class.$subroutine_name $argument_count\n"
-    }
+    } elseif {[$next_node stringValue] == "."} {
 
-    # (varName | className).subroutineName(expressionList)
-    elseif {[$next_node stringValue] == "."} {
-
+        # (varName | className).subroutineName(expressionList)
+        
         set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
-       
-        if {$var_record != null } {
+        
+        puts $var_record
+        if {$var_record != {null}} {
 
             # Obj.Func(x,y)
             set subroutine_name [[lindex $children 2] stringValue]
@@ -121,8 +122,7 @@ proc subroutine_call_to_vm {node scope_name} {
             append vm_code "push [dict get $var_record kind] [dict get $var_record index]\n"
             append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
             append vm_code "call [dict get $var_record type].$subroutine_name $argument_count\n"
-        }
-        elseif {[$first_node stringValue] == [get_scops_class]} {
+        } elseif {$first_node_name == [get_scops_class]} {
 
             # MyClass.Func(x,y)
             set argument_count [llength [::dom::selectNode [lindex $children 4] *]]
@@ -130,8 +130,7 @@ proc subroutine_call_to_vm {node scope_name} {
             set subroutine_name [[lindex $children 2] stringValue]
             append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
             append vm_code "call $scope_class.$subroutine_name $argument_count\n"
-        }
-        else {
+        } else {
 
             #OtherClass.Func(x,y)
             set argument_count [llength [::dom::selectNode [lindex $children 4] *]]
@@ -165,10 +164,10 @@ proc op_to_vm {node} {
         "-" {return "sub\n"}
         "*" {return "call Math.multiply 2\n"}
         "/" {return "call Math.divide 2\n"}
-        "&" {return "and\n"}
+        "&amp;" {return "and\n"}
         "|" {return "or\n"}
-        "<" {return "lt\n"}
-        ">" {return "gt\n"}
+        "&lt;" {return "lt\n"}
+        "&gt;" {return "gt\n"}
         "=" {return "eq\n"}
     }
 }

@@ -95,6 +95,9 @@ proc get_record_as_dict {scope_name name} {
   global __symble_table_doc
   # fetch the record from the scope
   set record [::dom::selectNode $__symble_table_doc /scops/$scope_name/$name]
+if {$record == ""} {
+  return null
+}
 
   # gets the attributes of the record
   set type [::dom::element getAttribute $record type]
