@@ -28,6 +28,8 @@ proc statements_to_vm {node scope_name} {
 
 # Convert a LetStatement node to VM code
 proc let_statement_to_vm {node scope_name} {
+puts "here is debug sybol-table"
+  dump_symble_table
   set vm_code ""
   set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
   set expressions [::dom::selectNode $node expression]
@@ -38,6 +40,9 @@ puts $name
     # handle array index assingment
     #if {[dict get $variable_record type] eq "Array" && [llength $expressions] == 2} 
   if {$name eq "Array" && [llength $expressions] == 2} {
+   
+    puts "here is debug sybol-table"
+    dump_symble_table
     set vm_index_expression [expression_to_vm [lindex $expressions 0] $scope_name]
     set vm_assignment_expression [expression_to_vm [lindex $expressions 1] $scope_name]
 

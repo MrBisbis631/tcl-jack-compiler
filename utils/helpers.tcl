@@ -17,15 +17,3 @@ proc pipe_coroutine_generator {command generator} {
   set gen_res [$generator]
   yield [$command $gen_res]
 }
-
-proc char_to_ascii {char} {
-    # Check if the input is a single character
-    if {[string length $char] != 1} {
-        error "Input must be a single character"
-    }
-    
-    # Convert the character to its ASCII value
-    set ascii_value [scan $char %c]
-    
-    return $ascii_value
-}
