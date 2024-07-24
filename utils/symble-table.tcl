@@ -2,17 +2,20 @@
 
 set __symble_table_doc [::dom::DOMImplementation create]
 set scops [::dom::document createElement $__symble_table_doc scops]
+set __class_name ""
 
 # clear the symble table
 proc clear_symble_table {} {
-  global __symble_table_doc scops
+  global __symble_table_doc scops __class_name
   set __symble_table_doc [::dom::DOMImplementation create]
   set scops [::dom::document createElement $__symble_table_doc scops]
+  set __class_name ""
 }
 
 # Set the class of the scops element
 proc set_scops_class {class_name} {
-  global scops
+  global scops __class_name
+  set __class_name $class_name
   ::dom::element setAttribute $scops class $class_name
 }
 
@@ -89,15 +92,26 @@ proc get_record {scope_name name} {
   return [list $type $kind $index]
 }
 
+# Get a record from a class scope in the format {type kind index}
+proc get_class_record {name} {
+  global __symble_table_doc
+  # fetch the record from the scope
+  set record [::dom::selectNode $__symble_table_doc /scops/$__class_name/$name]
+
+  # gets the attributes of the record
+  set type [::dom::element getAttribute $record type]
+  set kind [::dom::element getAttribute $record kind]
+  set index [::dom::element getAttribute $record index]
+
+  return [list $type $kind $index]
+}
+
 
 # Get a record from a scope in the format {type kind index}
 proc get_record_as_dict {scope_name name} {
   global __symble_table_doc
   # fetch the record from the scope
   set record [::dom::selectNode $__symble_table_doc /scops/$scope_name/$name]
-if {$record == ""} {
-  return null
-}
 
   # gets the attributes of the record
   set type [::dom::element getAttribute $record type]
