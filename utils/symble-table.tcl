@@ -65,7 +65,7 @@ proc create_record {scope_name name type kind} {
       set count [::dom::element getAttribute $scope local_count]
       ::dom::element setAttribute $scope local_count [expr $count + 1]
     }
-    "var" {
+    "temp" {
       set count [::dom::element getAttribute $scope var_count]
       ::dom::element setAttribute $scope var_count [expr $count + 1]
     }
@@ -109,9 +109,19 @@ proc get_class_record {name} {
 
 # Get a record from a scope in the format {type kind index}
 proc get_record_as_dict {scope_name name} {
-  global __symble_table_doc
+  global __symble_table_doc __class_name
   # fetch the record from the scope
   set record [::dom::selectNode $__symble_table_doc /scops/$scope_name/$name]
+
+  # handle class fields and statics
+  if {$record == ""} {
+    set record [::dom::selectNode $__symble_table_doc /scops/$__class_name/$name]
+  }
+
+  # handle external scops
+  if {$record == ""} {
+    return ""
+  }
 
   # gets the attributes of the record
   set type [::dom::element getAttribute $record type]
