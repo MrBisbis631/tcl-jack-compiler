@@ -94,7 +94,8 @@ proc subroutine_dec_to_vm {node} {
 
   set subroutine_scope  [get_scope_as_dict $subroutine_name]
 
-  set args_count [dict get $subroutine_scope local_count]
+  set args_count [dict get $subroutine_scope argument_count]
+  set local_count [dict get $subroutine_scope local_count]
 
   # method has an argument this
   if {[dict get $subroutine_scope type] == "method"} {
@@ -102,8 +103,13 @@ proc subroutine_dec_to_vm {node} {
   }
 
   # function signature
-  append vm_code "function  [get_scops_class].$subroutine_name $args_count\n"
-
+  append vm_code "function [get_scops_class].$subroutine_name $local_count\n"
+  
+  if {$subroutine_type == "constructor"} {
+   append vm_code "push constant $args_count\n"
+   append vm_code "call Memory.alloc 1\n"
+   append vm_code "pop pointer 0\n"
+   }
   # init local variables with 0
   #for {set index 0} {$index < [dict get $subroutine_scope local_count]} {incr index} {
   #  append vm_code "push constant 0\npop local [expr $index+1]\n"

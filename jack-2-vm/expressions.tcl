@@ -131,6 +131,7 @@ proc subroutine_call_to_vm {node scope_name} {
 
             #OtherClass.Func(x,y)
             set argument_count [llength [::dom::selectNode [lindex $children 4] *]]
+            set argument_count [expr {$argument_count - $argument_count/2}]
             set class_name [$first_node stringValue]
             set subroutine_name [[lindex $children 2] stringValue]
             append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
