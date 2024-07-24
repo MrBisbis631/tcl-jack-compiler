@@ -53,6 +53,10 @@ proc create_record {scope_name name type kind} {
       set count [::dom::element getAttribute $scope static_count]
       ::dom::element setAttribute $scope static_count [expr $count + 1]
     }
+     "this" {
+      set count [::dom::element getAttribute $scope field_count]
+      ::dom::element setAttribute $scope field_count [expr $count + 1]
+    }
     "field" {
       set count [::dom::element getAttribute $scope field_count]
       ::dom::element setAttribute $scope field_count [expr $count + 1]

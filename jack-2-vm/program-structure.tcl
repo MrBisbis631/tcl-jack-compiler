@@ -94,7 +94,7 @@ proc subroutine_dec_to_vm {node} {
 
   set subroutine_scope  [get_scope_as_dict $subroutine_name]
 
-  set args_count [dict get $subroutine_scope argument_count]
+  set args_count [dict get $subroutine_scope local_count]
 
   # method has an argument this
   if {[dict get $subroutine_scope type] == "method"} {
@@ -105,9 +105,11 @@ proc subroutine_dec_to_vm {node} {
   append vm_code "function  [get_scops_class].$subroutine_name $args_count\n"
 
   # init local variables with 0
-  for {set index 0} {$index < [dict get $subroutine_scope local_count]} {incr index} {
-    append vm_code "push constant 0\npop local [expr $index+1]\n"
-  }
+  #for {set index 0} {$index < [dict get $subroutine_scope local_count]} {incr index} {
+  #  append vm_code "push constant 0\npop local [expr $index+1]\n"
+  #}
+ 
+  # Memory allocation
 
   # statements
   append vm_code [statements_to_vm [::dom::selectNode $node subroutineBody/statements] $subroutine_name]
