@@ -28,21 +28,16 @@ proc statements_to_vm {node scope_name} {
 
 # Convert a LetStatement node to VM code
 proc let_statement_to_vm {node scope_name} {
-puts "here is debug sybol-table"
-  dump_symble_table
+  # dump_symble_table
   set vm_code ""
   set variable_record [get_record_as_dict $scope_name [first_node_value $node "identifier"]]
   set expressions [::dom::selectNode $node expression]
-puts "here is let_stament code"
-puts $variable_record
-set name [first_node_value $node "identifier"]
-puts $name
-    # handle array index assingment
-    #if {[dict get $variable_record type] eq "Array" && [llength $expressions] == 2} 
-  if {$name eq "Array" && [llength $expressions] == 2} {
-   
-    puts "here is debug sybol-table"
-    dump_symble_table
+  set name [first_node_value $node "identifier"]
+
+  # handle array index assingment
+  #if {[dict get $variable_record type] eq "Array" && [llength $expressions] == 2}
+  if {[llength $expressions] == 2} {
+    # handle array index assignment
     set vm_index_expression [expression_to_vm [lindex $expressions 0] $scope_name]
     set vm_assignment_expression [expression_to_vm [lindex $expressions 1] $scope_name]
 
@@ -54,8 +49,9 @@ puts $name
     append vm_code "pop pointer 1\n"
     append vm_code "push temp 0\n"
     append vm_code "pop that 0\n"
+
   } else {
-    append vm_code [expression_to_vm [::dom::selectNode $node expression] $scope_name]
+    append vm_code [expression_to_vm $expressions $scope_name]
     append vm_code "pop [dict get $variable_record kind] [dict get $variable_record index]\n"
   }
 
@@ -72,7 +68,7 @@ proc if_statement_to_vm {node scope_name} {
   set has_else [expr {[llength $statements] == 2}]
 
   # evaluate the if expression
-  append vm_code [expression_to_vm [::dom::selectNode $node expression] $scope_name]
+  append vm_code [expression_to_vm $expression $scope_name]
   append vm_code "not\n"
 
   if {$has_else} {

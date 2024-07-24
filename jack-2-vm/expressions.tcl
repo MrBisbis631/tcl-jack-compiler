@@ -1,6 +1,5 @@
 # expression node to vm code
 proc expression_to_vm {node scope} {
-    puts "expression_to_vm: $node $scope"
     set vm_code ""
     set children [::dom::selectNode $node *]
 
@@ -71,9 +70,11 @@ proc term_to_vm {node scope_name} {
 
                 # varName[expression]
             } elseif {[$next_node stringValue] == "\["} {
+                # puts "varName [lindex children 1]"
+
                 set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
-                append vm_code "push [dict get $var_record type] [dict get $var_record index]\n"
-                append vm_code [expression_to_vm [lindex children 2] $scope_name]
+                append vm_code "push [dict get $var_record kind] [dict get $var_record index]\n"
+                append vm_code [expression_to_vm [lindex $children 2] $scope_name]
                 append vm_code "add\n"
                 append vm_code "pop pointer 1\n"
                 append vm_code "push that 0\n"
@@ -99,22 +100,18 @@ proc subroutine_call_to_vm {node scope_name} {
 
     # subroutineName(expressionList)
     if {[$next_node stringValue] == "("} {
-
         append vm_code "push pointer 0\n"
         append vm_code [expression_list_to_vm [lindex $children 2] $scope_name]
-        set  subroutine_scop [get_scope_as_dict $scope_name [$first_node stringValue]]
-        set scope_class [get_scops_class]
-        set subroutine_name [$first_node stringValue]
-        set argument_count [expr {[dict get $subroutine_scop argument_count] +1}]
-        append vm_code "call $scope_class.$subroutine_name $argument_count\n"
+
+        set argument_count [expr {[llength [::dom::selectNode [lindex $children 2] *]] + 1}]
+
+        append vm_code "call [get_scops_class].$first_node_name $argument_count\n"
     } elseif {[$next_node stringValue] == "."} {
 
         # (varName | className).subroutineName(expressionList)
-        
         set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
-        
-        puts $var_record
-        if {$var_record != {null}} {
+
+        if {$var_record != ""} {
 
             # Obj.Func(x,y)
             set subroutine_name [[lindex $children 2] stringValue]
@@ -138,9 +135,7 @@ proc subroutine_call_to_vm {node scope_name} {
             set subroutine_name [[lindex $children 2] stringValue]
             append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
             append vm_code "call $class_name.$subroutine_name $argument_count\n"
-
         }
-
     }
 
     return $vm_code
