@@ -160,10 +160,10 @@ proc op_to_vm {node} {
         "-" {return "sub\n"}
         "*" {return "call Math.multiply 2\n"}
         "/" {return "call Math.divide 2\n"}
-        "&amp;" {return "and\n"}
+        "&" {return "and\n"}
         "|" {return "or\n"}
-        "&lt;" {return "lt\n"}
-        "&gt;" {return "gt\n"}
+        "<" {return "lt\n"}
+        ">" {return "gt\n"}
         "=" {return "eq\n"}
     }
 }
