@@ -69,7 +69,7 @@ proc if_statement_to_vm {node scope_name} {
 
   # evaluate the if expression
   append vm_code [expression_to_vm $expression $scope_name]
-  #append vm_code "not\n"
+  append vm_code "not\n"
 
   if {$has_else} {
     append vm_code "if-goto $else_label\n"
