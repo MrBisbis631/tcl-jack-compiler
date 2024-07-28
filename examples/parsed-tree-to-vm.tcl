@@ -70,19 +70,19 @@ foreach tree_file $tree_files {
 # -------------- Injecting jack-stdlib --------------
 
 # # inject jack-stdlib to output directory
-# inject_jack_stdlib $output_dir
+inject_jack_stdlib $output_dir
 
 # -------------- cleanup ----------------------------
 
 # 
 # wait_for_pool_to_finish $pool
 
-# # remove files that are not .vm
-# foreach file [glob -nocomplain -directory $output_dir -type f -tails *] {
-#   if {[file extension $file] ne ".vm"} {
-#     file delete -force [file join $output_dir $file]
-#   }
-# }
+# remove files that are not .vm
+foreach file [glob -nocomplain -directory $output_dir -type f -tails *] {
+  if {[file extension $file] ne ".vm"} {
+    file delete -force [file join $output_dir $file]
+  }
+}
 
 # wait for all workers to finish
 wait_for_pool_to_finish $pool
