@@ -17,3 +17,14 @@ proc pipe_coroutine_generator {command generator} {
   set gen_res [$generator]
   yield [$command $gen_res]
 }
+
+# gets argument count from expression list node
+proc get_argument_count {expression_list_node} {
+  set argument_count 0
+  foreach args_item [::dom::selectNode $expression_list_node *] {
+    if {[$args_item cget -nodeName] != "symbol"} {
+      incr argument_count
+    }
+  }
+  return $argument_count
+}
