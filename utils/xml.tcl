@@ -37,7 +37,7 @@ proc xml_to_tokens_generator {doc} {
   # yield empty forr init
   yield ""
   foreach token [::dom::selectNode $doc /tokens/*] {
-    set value [string trim [$token stringValue]]
+    set value [$token stringValue]
     set type [$token cget -nodeName]
     yield [dict create type $type value $value]
   }
