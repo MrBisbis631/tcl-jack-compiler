@@ -103,39 +103,32 @@ proc subroutine_call_to_vm {node scope_name} {
         append vm_code "push pointer 0\n"
         append vm_code [expression_list_to_vm [lindex $children 2] $scope_name]
 
-        set argument_count [expr {[llength [::dom::selectNode [lindex $children 2] *]] + 1}]
-
+        set argument_count [get_argument_count [lindex $children 2]]
+        incr argument_count ;# add this pointer
         append vm_code "call [get_scops_class].$first_node_name $argument_count\n"
+
+    # (varName | className).subroutineName(expressionList)
     } elseif {[$next_node stringValue] == "."} {
 
-        # (varName | className).subroutineName(expressionList)
         set var_record [get_record_as_dict $scope_name [$first_node stringValue]]
+        set subroutine_name [[lindex $children 2] stringValue]
+        set expression_list [lindex $children 4]
+        set argument_count [get_argument_count $expression_list]
 
+        # loccal var method call
         if {$var_record != ""} {
-
-            # Obj.Func(x,y)
-            set subroutine_name [[lindex $children 2] stringValue]
-            set argument_count [expr {[llength [::dom::selectNode [lindex $children 4] *]] +1}]
+            incr argument_count ;# add this pointer
             append vm_code "push [dict get $var_record kind] [dict get $var_record index]\n"
-            append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
+            append vm_code [expression_list_to_vm $expression_list $scope_name]
             append vm_code "call [dict get $var_record type].$subroutine_name $argument_count\n"
+        # static call  
         } elseif {$first_node_name == [get_scops_class]} {
-
-            # MyClass.Func(x,y)
-            set argument_count [llength [::dom::selectNode [lindex $children 4] *]]
-            set scope_class [get_scops_class]
-            set subroutine_name [[lindex $children 2] stringValue]
-            append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
-            append vm_code "call $scope_class.$subroutine_name $argument_count\n"
+            append vm_code [expression_list_to_vm $expression_list $scope_name]
+            append vm_code "call [get_scops_class].$subroutine_name $argument_count\n"
         } else {
-
-            #OtherClass.Func(x,y)
-            set argument_count [llength [::dom::selectNode [lindex $children 4] *]]
-            set argument_count [expr {$argument_count - $argument_count/2}]
-            set class_name [$first_node stringValue]
-            set subroutine_name [[lindex $children 2] stringValue]
-            append vm_code [expression_list_to_vm [lindex $children 4] $scope_name]
-            append vm_code "call $class_name.$subroutine_name $argument_count\n"
+            # static on other class
+            append vm_code [expression_list_to_vm $expression_list $scope_name]
+            append vm_code "call $first_node_name.$subroutine_name $argument_count\n"
         }
     }
 
