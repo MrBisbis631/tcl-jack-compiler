@@ -14,10 +14,10 @@ if {[llength $argv] == 0} {
 # set the output directory
 set output_dir [set_up_target_dir "ex5/[lindex $argv 0]"]
 
-# init a thread pool with scripts `jack_2_vm_file_script`, `tokenize_file_to_xml_script`, `parse_token_xml_file_script` 
+# init a thread pool with scripts `jack_2_vm_file_script`, `tokenize_file_to_xml_script`, `parse_token_xml_file_script`
 set pool [create_thread_pool $workers \
-    "$parse_token_xml_file_script\n$tokenize_file_to_xml_script\n$jack_2_vm_file_script\n"
-  ]
+  "$parse_token_xml_file_script\n$tokenize_file_to_xml_script\n$jack_2_vm_file_script\n"
+]
 # init a corutine that returns the workers in round-robin
 coroutine round_robin_coroutine thread_round_robin_generator $pool
 
@@ -60,7 +60,7 @@ wait_for_pool_to_finish $pool
 set tree_files [get_files_name_by_extention "target/ex5/[lindex $argv 0]" ".xml"]
 foreach file $tree_files {
   puts "Parsing tree file: $file"
-  
+
 }
 # send each file to a worker
 foreach tree_file $tree_files {
@@ -74,10 +74,10 @@ inject_jack_stdlib $output_dir
 
 # -------------- cleanup ----------------------------
 
-# 
-# wait_for_pool_to_finish $pool
+#
+wait_for_pool_to_finish $pool
 
-# remove files that are not .vm
+# # remove files that are not .vm
 foreach file [glob -nocomplain -directory $output_dir -type f -tails *] {
   if {[file extension $file] ne ".vm"} {
     file delete -force [file join $output_dir $file]
